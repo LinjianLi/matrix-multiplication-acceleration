@@ -33,6 +33,7 @@ int main(int argc, char *argv[]) {
 
   int s;
   //printf("Select a method: ");
+//  scanf("%d", &s);
   fscanf(runtime_control_file, "%d", &s);
 
   while (s>0) {
@@ -45,45 +46,47 @@ int main(int argc, char *argv[]) {
 
     switch(s) {
       case 1:
-        c = SquareMatrixMul_SimpleSerial(a,b,n);         // N: 1024. seed: 0.3. Trace: 252535. Time: 32602742ms.
+        c = SquareMatrixMul_SimpleSerial(a,b,n);
         break;
       case 2:
-        c = SquareMatrixMul_MultiThreadsByOMP(a,b,n);    // N: 1024. seed: 0.3. Trace: 252535. Time:  10517104ms.
+        c = SquareMatrixMul_MultiThreadsByOMP(a,b,n);
         break;
       case 3:
-        c = SquareMatrixMul_SplitToBlocks(a,b,n,16);     // N: 1024. seed: 0.3. Trace: 252535.  Time: 23690175ms.
+        c = SquareMatrixMul_SplitToBlocks(a,b,n,32);
+        break;
       case 4:
-        c = SquareMatrixMul_SplitToBlocks(a,b,n,32);     // N: 1024. seed: 0.3. Trace: 252535.  Time: 11215231ms.
+        c = SquareMatrixMul_SplitToBlocks(a,b,n,64);
         break;
       case 5:
-        c = SquareMatrixMul_SplitToBlocks(a,b,n,64);     // N: 1024. seed: 0.3. Trace: 252535.  Time: 11036118ms.
+        c = SquareMatrixMul_SplitToBlocks(a,b,n,128);
         break;
       case 6:
-        c = SquareMatrixMul_SplitToBlocks(a,b,n,128);    // N: 1024. seed: 0.3. Trace: 252535.  Time: 12629315ms.
+        c = SquareMatrixMul_SplitToBlocks(a,b,n,256);
         break;
       case 7:
-        c = SquareMatrixMul_SplitToBlocks_MultiThreadsByOMP(a,b,n,16); // N: 1024. seed: 0.3. Trace: 252535.  Time: 10057319ms.
+        c = SquareMatrixMul_SplitToBlocks_MultiThreadsByOMP(a,b,n,32);
         break;
       case 8:
-        c = SquareMatrixMul_SplitToBlocks_MultiThreadsByOMP(a,b,n,32); // N: 1024. seed: 0.3. Trace: 252535.  Time: 4469068ms.
+        c = SquareMatrixMul_SplitToBlocks_MultiThreadsByOMP(a,b,n,64);
         break;
       case 9:
-        c = SquareMatrixMul_SplitToBlocks_MultiThreadsByOMP(a,b,n,64); // N: 1024. seed: 0.3. Trace: 252535.  Time: 3720381ms.
+        c = SquareMatrixMul_SplitToBlocks_MultiThreadsByOMP(a,b,n,128);
         break;
       case 10:
-        c = SquareMatrixMul_SplitToBlocks_MultiThreadsByOMP(a,b,n,128); // N: 1024. seed: 0.3. Trace: 252535.  Time: 3736721ms.
+        c = SquareMatrixMul_SplitToBlocks_MultiThreadsByOMP(a,b,n,256);
         break;
       case 11:
-        c = SquareMatrixMul_SSE(a,b,n);                                 // N: 1024. seed: 0.3. Trace: 252535.  Time: 3736721ms.
+        c = SquareMatrixMul_SSE(a,b,n);
         break;
       case 12:
-        c = SquareMatrixMul_AVX(a,b,n);                                 // N: 1024. seed: 0.3. Trace: 252535.  Time: 6086102ms.
+        c = SquareMatrixMul_AVX(a,b,n);
         break;
       case 13:
-        c = SquareMatrixMul_BlocksAndSSE(a,b,n,64);                    // N: 1024. seed: 0.3. Trace: 252535.  Time: 3736721ms.
+        c = SquareMatrixMul_BlocksAndSSE(a,b,n,64);
         break;
       default:
         fprintf(log_file, "Invalid input!\n");
+        break;
     }
 
 //    printf("-----matrix c-----\n");// todo: delete
@@ -92,20 +95,31 @@ int main(int argc, char *argv[]) {
 
     float trace = SquareMatrixTrace(c,n);
 
-    fprintf(log_file, "method %d\tTrace: %d\n", s, trace);
+    fprintf(log_file, "method %d\tTrace: %f\n", s, trace);
+//    printf("method %d\tTrace: %f\n", s, trace);
 
     // Calculate the time spent by the multiplication.
     gettimeofday(&end,NULL);
     diff = 1000000*(end.tv_sec-start.tv_sec) + (end.tv_usec-start.tv_usec);
     setlocale(LC_NUMERIC, "");
     fprintf(log_file, "The time spent is %'ld microseconds\n----------\n", diff);
+    fflush(log_file);
+//    printf("The time spent is %'ld microseconds\n----------\n", diff);
     // diff is time spent by the program, and the unit is microsecond
 
 
+    free(c);
+
     //printf("Select a method: ");
+//    scanf("%d", &s);
     fscanf(runtime_control_file, "%d", &s);
   }
 
+  fclose(log_file);
+  fclose(runtime_control_file);
+
+  free(a);
+  free(b);
 
   return 0;
 }

@@ -37,7 +37,6 @@ float SquareMatrixTrace(float *mtrx, int n) {
 }
 
 void PrintSquareMatrix(float *mtrx, size_t n) {
-  #pragma omp parallel for
   for (size_t i=0; i<n; ++i) {
     for (size_t j=0; j<n; ++j) {
       printf("%.4f  ", mtrx[Convert2DIndexTo1DIndex(n,i,j)]);
@@ -52,7 +51,7 @@ void SquareMatrixAddTo(float *dest, float *src, int n) {
 }
 
 float* SquareMatrixMul_SimpleSerial(float *a, float *b, int n) {
-  float *result = malloc(n*n * sizeof(*result));  // float *result = new float[n*n];
+  float *result = malloc(n*n * sizeof(*result));
   for (size_t i=0; i<n; ++i) {
     for (size_t j=0; j<n; ++j) {
       size_t index = Convert2DIndexTo1DIndex(n,i,j);
@@ -95,6 +94,7 @@ float* SquareMatrixMul_SSE(float *a, float *b, int n) {
       _mm_store_ps(result+Convert2DIndexTo1DIndex(n,row,col), sum_elem_mul);
     }
   }
+  free(rows_right_matrix);
   return result;
 }
 
@@ -121,7 +121,7 @@ float* SquareMatrixMul_AVX(float *a, float *b, int n) {
       //       It will cause segmentation fault.
       //rows_right_matrix[row] = _mm256_load_ps(b+Convert2DIndexTo1DIndex(n,row,col));
       __m256 test = _mm256_load_ps(b+Convert2DIndexTo1DIndex(n,row,col));
-      rows_right_matrix[row] = _mm256_load_ps(b+Convert2DIndexTo1DIndex(n,row,col));;
+      rows_right_matrix[row] = test;
 
 
     }
@@ -142,7 +142,7 @@ float* SquareMatrixMul_AVX(float *a, float *b, int n) {
 
 float* SquareMatrixMul_MultiThreadsByOMP(float *a, float *b, int n) {
 
-  float *result = malloc(n*n * sizeof(*result));  // float *result = new float[n*n];
+  float *result = malloc(n*n * sizeof(*result));
 
   #pragma omp parallel for collapse(2)
   for (size_t i=0; i<n; ++i) {
@@ -166,7 +166,7 @@ float* SquareMatrixSelectSquareBlock(float* original_mtrx, size_t original_mtrx_
   for (size_t i=0; i<block_size; ++i) {
     for (size_t j=0; j<block_size; ++j) {
       result[Convert2DIndexTo1DIndex(block_size,i,j)]
-        = original_mtrx[Convert2DIndexTo1DIndex(original_mtrx_size, i+top, j+left)];
+              = original_mtrx[Convert2DIndexTo1DIndex(original_mtrx_size, i+top, j+left)];
     }
   }
   return result;
@@ -188,28 +188,30 @@ void FillSquareBlockInToBigSquareMatrix(float *block, size_t block_size,
 
 
 float* SquareMatrixMul_SplitToBlocks(float *a, float *b, int matrix_order, int block_size) {
-
-  float *result = malloc(matrix_order*matrix_order * sizeof(*result));  // float *result = new float[matrix_order*matrix_order];
-
+  float *result = malloc(matrix_order*matrix_order * sizeof(*result));
   for (size_t i=0; i<matrix_order; i+=block_size) {
     for (size_t j=0; j<matrix_order; j+=block_size) {
       float *block_result = InitZeroSquareMatrix(block_size);
       for (size_t k=0; k<matrix_order; k+=block_size) {
         float *block_a = SquareMatrixSelectSquareBlock(a,matrix_order,i,k,block_size);
         float *block_b = SquareMatrixSelectSquareBlock(b,matrix_order,k,j,block_size);
-        SquareMatrixAddTo(block_result, SquareMatrixMul_SimpleSerial(block_a,block_b,block_size), block_size);
+        float *block_c = SquareMatrixMul_SimpleSerial(block_a,block_b,block_size);
+        SquareMatrixAddTo(block_result, block_c, block_size);
+        free(block_a);
+        free(block_b);
+        free(block_c);
       }
       FillSquareBlockInToBigSquareMatrix(block_result,block_size,result,matrix_order,i,j);
+      free(block_result);
     }
   }
-
   return result;
 }
 
 
 float* SquareMatrixMul_SplitToBlocks_MultiThreadsByOMP(float *a, float *b, int matrix_order, int block_size) {
-
-  float *result = malloc(matrix_order*matrix_order * sizeof(*result));  // float *result = new float[matrix_order*matrix_order];
+// todo: fix the bug of memory leak
+  float *result = malloc(matrix_order*matrix_order * sizeof(*result));
   #pragma omp parallel for collapse(2)
   for (size_t i=0; i<matrix_order; i+=block_size) {
     for (size_t j=0; j<matrix_order; j+=block_size) {
@@ -217,11 +219,14 @@ float* SquareMatrixMul_SplitToBlocks_MultiThreadsByOMP(float *a, float *b, int m
       for (size_t k=0; k<matrix_order; k+=block_size) {
         float *block_a = SquareMatrixSelectSquareBlock(a,matrix_order,i,k,block_size);
         float *block_b = SquareMatrixSelectSquareBlock(b,matrix_order,k,j,block_size);
-        SquareMatrixAddTo(block_result, SquareMatrixMul_MultiThreadsByOMP(block_a,block_b,block_size), block_size);
-        //SquareMatrixAddTo(block_result, SquareMatrixMul_SimpleSerial(block_a,block_b,block_size), block_size);
+        float *block_c = SquareMatrixMul_SimpleSerial(block_a,block_b,block_size);
+        SquareMatrixAddTo(block_result, block_c, block_size);
+        free(block_a);
+        free(block_b);
+        free(block_c);
       }
       FillSquareBlockInToBigSquareMatrix(block_result,block_size,result,matrix_order,i,j);
-
+      free(block_result);
     }
   }
 
@@ -231,18 +236,22 @@ float* SquareMatrixMul_SplitToBlocks_MultiThreadsByOMP(float *a, float *b, int m
 
 // todo: implement
 float* SquareMatrixMul_BlocksAndSSE(float *a, float *b, int matrix_order, int block_size) {
-
-  float *result = malloc(matrix_order*matrix_order * sizeof(*result));  // float *result = new float[matrix_order*matrix_order];
-
+// todo: fix the bug of memory leak
+  float *result = malloc(matrix_order*matrix_order * sizeof(*result));
   for (size_t i=0; i<matrix_order; i+=block_size) {
     for (size_t j=0; j<matrix_order; j+=block_size) {
       float *block_result = InitZeroSquareMatrix(block_size);
       for (size_t k=0; k<matrix_order; k+=block_size) {
         float *block_a = SquareMatrixSelectSquareBlock(a,matrix_order,i,k,block_size);
         float *block_b = SquareMatrixSelectSquareBlock(b,matrix_order,k,j,block_size);
-        SquareMatrixAddTo(block_result, SquareMatrixMul_SSE(block_a,block_b,block_size), block_size);
+        float *block_c = SquareMatrixMul_SimpleSerial(block_a,block_b,block_size);
+        SquareMatrixAddTo(block_result, block_c, block_size);
+        free(block_a);
+        free(block_b);
+        free(block_c);
       }
       FillSquareBlockInToBigSquareMatrix(block_result,block_size,result,matrix_order,i,j);
+      free(block_result);
     }
   }
 
@@ -253,14 +262,11 @@ float* SquareMatrixMul_BlocksAndSSE(float *a, float *b, int matrix_order, int bl
 // todo: implement
 float* SquareMatrixMul_BlocksAndAVX(float *a, float *b, int matrix_order, int block_size) {
 
-  float *result = malloc(matrix_order*matrix_order * sizeof(*result));  // float *result = new float[matrix_order*matrix_order];
-
+  float *result = malloc(matrix_order*matrix_order * sizeof(*result));
   // todo: implement
 
   return result;
 }
-
-
 
 
 #endif //MATRIX_MULTIPLICATION_ACCELERATION_MATRIXCALCU_H
