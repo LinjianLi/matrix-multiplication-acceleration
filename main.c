@@ -14,8 +14,14 @@ int main(int argc, char *argv[]) {
   float *a = malloc(n*n * sizeof(*a));  // float *a = new float[n*n];
   float *b = malloc(n*n * sizeof(*b));
 
-
   matrix_gen(a,b,n,seed);
+
+
+  FILE *log_file, *runtime_control_file;
+  log_file = fopen("sort-algorithm-acceleration-program-log.txt", "w");
+  runtime_control_file = fopen("sort-algorithm-acceleration-runtime-control.txt", "r");
+
+  fprintf(log_file, "Order of matrix: %d\nSeed: %f\n----------\n", n, seed);
 
 //  printf("-----matrix a-----\n");// todo: delete
 //  PrintSquareMatrix(a,n);// todo: delete
@@ -26,8 +32,8 @@ int main(int argc, char *argv[]) {
   float *c;
 
   int s;
-  printf("Select a method: ");
-  scanf("%d", &s);
+  //printf("Select a method: ");
+  fscanf(runtime_control_file, "%d", &s);
 
   while (s>0) {
     // To record the start and end time of the multiplication.
@@ -77,28 +83,27 @@ int main(int argc, char *argv[]) {
         c = SquareMatrixMul_BlocksAndSSE(a,b,n,64);                    // N: 1024. seed: 0.3. Trace: 252535.  Time: 3736721ms.
         break;
       default:
-        printf("Invalid input!\n");
+        fprintf(log_file, "Invalid input!\n");
     }
-
 
 //    printf("-----matrix c-----\n");// todo: delete
 //    PrintSquareMatrix(c,n);  // todo: delete
 //    printf("----------\n");// todo: delete
 
     float trace = SquareMatrixTrace(c,n);
-    printf("Trace %f\n", trace);
 
+    fprintf(log_file, "method %d\tTrace: %d\n", s, trace);
 
     // Calculate the time spent by the multiplication.
     gettimeofday(&end,NULL);
     diff = 1000000*(end.tv_sec-start.tv_sec) + (end.tv_usec-start.tv_usec);
     setlocale(LC_NUMERIC, "");
-    printf("The time spent is %'ld microseconds\n----------\n", diff);
+    fprintf(log_file, "The time spent is %'ld microseconds\n----------\n", diff);
     // diff is time spent by the program, and the unit is microsecond
 
 
-    printf("Select a method: ");
-    scanf("%d", &s);
+    //printf("Select a method: ");
+    fscanf(runtime_control_file, "%d", &s);
   }
 
 

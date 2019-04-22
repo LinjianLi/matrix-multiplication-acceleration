@@ -187,19 +187,19 @@ void FillSquareBlockInToBigSquareMatrix(float *block, size_t block_size,
 
 
 
-float* SquareMatrixMul_SplitToBlocks(float *a, float *b, int matrix_size, int block_size) {
+float* SquareMatrixMul_SplitToBlocks(float *a, float *b, int matrix_order, int block_size) {
 
-  float *result = malloc(matrix_size*matrix_size * sizeof(*result));  // float *result = new float[matrix_size*matrix_size];
+  float *result = malloc(matrix_order*matrix_order * sizeof(*result));  // float *result = new float[matrix_order*matrix_order];
 
-  for (size_t i=0; i<matrix_size; i+=block_size) {
-    for (size_t j=0; j<matrix_size; j+=block_size) {
+  for (size_t i=0; i<matrix_order; i+=block_size) {
+    for (size_t j=0; j<matrix_order; j+=block_size) {
       float *block_result = InitZeroSquareMatrix(block_size);
-      for (size_t k=0; k<matrix_size; k+=block_size) {
-        float *block_a = SquareMatrixSelectSquareBlock(a,matrix_size,i,k,block_size);
-        float *block_b = SquareMatrixSelectSquareBlock(b,matrix_size,k,j,block_size);
+      for (size_t k=0; k<matrix_order; k+=block_size) {
+        float *block_a = SquareMatrixSelectSquareBlock(a,matrix_order,i,k,block_size);
+        float *block_b = SquareMatrixSelectSquareBlock(b,matrix_order,k,j,block_size);
         SquareMatrixAddTo(block_result, SquareMatrixMul_SimpleSerial(block_a,block_b,block_size), block_size);
       }
-      FillSquareBlockInToBigSquareMatrix(block_result,block_size,result,matrix_size,i,j);
+      FillSquareBlockInToBigSquareMatrix(block_result,block_size,result,matrix_order,i,j);
     }
   }
 
@@ -207,20 +207,20 @@ float* SquareMatrixMul_SplitToBlocks(float *a, float *b, int matrix_size, int bl
 }
 
 
-float* SquareMatrixMul_SplitToBlocks_MultiThreadsByOMP(float *a, float *b, int matrix_size, int block_size) {
+float* SquareMatrixMul_SplitToBlocks_MultiThreadsByOMP(float *a, float *b, int matrix_order, int block_size) {
 
-  float *result = malloc(matrix_size*matrix_size * sizeof(*result));  // float *result = new float[matrix_size*matrix_size];
+  float *result = malloc(matrix_order*matrix_order * sizeof(*result));  // float *result = new float[matrix_order*matrix_order];
   #pragma omp parallel for collapse(2)
-  for (size_t i=0; i<matrix_size; i+=block_size) {
-    for (size_t j=0; j<matrix_size; j+=block_size) {
+  for (size_t i=0; i<matrix_order; i+=block_size) {
+    for (size_t j=0; j<matrix_order; j+=block_size) {
       float *block_result = InitZeroSquareMatrix(block_size);
-      for (size_t k=0; k<matrix_size; k+=block_size) {
-        float *block_a = SquareMatrixSelectSquareBlock(a,matrix_size,i,k,block_size);
-        float *block_b = SquareMatrixSelectSquareBlock(b,matrix_size,k,j,block_size);
+      for (size_t k=0; k<matrix_order; k+=block_size) {
+        float *block_a = SquareMatrixSelectSquareBlock(a,matrix_order,i,k,block_size);
+        float *block_b = SquareMatrixSelectSquareBlock(b,matrix_order,k,j,block_size);
         SquareMatrixAddTo(block_result, SquareMatrixMul_MultiThreadsByOMP(block_a,block_b,block_size), block_size);
         //SquareMatrixAddTo(block_result, SquareMatrixMul_SimpleSerial(block_a,block_b,block_size), block_size);
       }
-      FillSquareBlockInToBigSquareMatrix(block_result,block_size,result,matrix_size,i,j);
+      FillSquareBlockInToBigSquareMatrix(block_result,block_size,result,matrix_order,i,j);
 
     }
   }
@@ -230,19 +230,19 @@ float* SquareMatrixMul_SplitToBlocks_MultiThreadsByOMP(float *a, float *b, int m
 
 
 // todo: implement
-float* SquareMatrixMul_BlocksAndSSE(float *a, float *b, int matrix_size, int block_size) {
+float* SquareMatrixMul_BlocksAndSSE(float *a, float *b, int matrix_order, int block_size) {
 
-  float *result = malloc(matrix_size*matrix_size * sizeof(*result));  // float *result = new float[matrix_size*matrix_size];
+  float *result = malloc(matrix_order*matrix_order * sizeof(*result));  // float *result = new float[matrix_order*matrix_order];
 
-  for (size_t i=0; i<matrix_size; i+=block_size) {
-    for (size_t j=0; j<matrix_size; j+=block_size) {
+  for (size_t i=0; i<matrix_order; i+=block_size) {
+    for (size_t j=0; j<matrix_order; j+=block_size) {
       float *block_result = InitZeroSquareMatrix(block_size);
-      for (size_t k=0; k<matrix_size; k+=block_size) {
-        float *block_a = SquareMatrixSelectSquareBlock(a,matrix_size,i,k,block_size);
-        float *block_b = SquareMatrixSelectSquareBlock(b,matrix_size,k,j,block_size);
+      for (size_t k=0; k<matrix_order; k+=block_size) {
+        float *block_a = SquareMatrixSelectSquareBlock(a,matrix_order,i,k,block_size);
+        float *block_b = SquareMatrixSelectSquareBlock(b,matrix_order,k,j,block_size);
         SquareMatrixAddTo(block_result, SquareMatrixMul_SSE(block_a,block_b,block_size), block_size);
       }
-      FillSquareBlockInToBigSquareMatrix(block_result,block_size,result,matrix_size,i,j);
+      FillSquareBlockInToBigSquareMatrix(block_result,block_size,result,matrix_order,i,j);
     }
   }
 
@@ -251,9 +251,9 @@ float* SquareMatrixMul_BlocksAndSSE(float *a, float *b, int matrix_size, int blo
 
 
 // todo: implement
-float* SquareMatrixMul_BlocksAndAVX(float *a, float *b, int matrix_size, int block_size) {
+float* SquareMatrixMul_BlocksAndAVX(float *a, float *b, int matrix_order, int block_size) {
 
-  float *result = malloc(matrix_size*matrix_size * sizeof(*result));  // float *result = new float[matrix_size*matrix_size];
+  float *result = malloc(matrix_order*matrix_order * sizeof(*result));  // float *result = new float[matrix_order*matrix_order];
 
   // todo: implement
 
