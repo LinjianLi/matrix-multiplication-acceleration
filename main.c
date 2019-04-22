@@ -18,8 +18,8 @@ int main(int argc, char *argv[]) {
 
 
   FILE *log_file, *runtime_control_file;
-  log_file = fopen("sort-algorithm-acceleration-program-log.txt", "w");
-  runtime_control_file = fopen("sort-algorithm-acceleration-runtime-control.txt", "r");
+  log_file = fopen("program-log.txt", "w");
+  runtime_control_file = fopen("runtime-control.txt", "r");
 
   fprintf(log_file, "Order of matrix: %d\nSeed: %f\n----------\n", n, seed);
 
