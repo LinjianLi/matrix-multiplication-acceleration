@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
     double diff;
     gettimeofday(&start,NULL);
 
-    c = SquareMatrixMul_SquareMatrixMul_MultiThreadsByOMP(a,b,n,arr_num_threads[i]);
+    c = SquareMatrixMul_OMP(a,b,n,arr_num_threads[i]);
     float trace = SquareMatrixTrace(c,n);
 
     fprintf(log_file, "%d Threads\n", arr_num_threads[i]);
