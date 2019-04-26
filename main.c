@@ -73,25 +73,25 @@ int main(int argc, char *argv[]) {
         c = SquareMatrixMul_SplitToBlocks_MultiThreadsByOMP(a,b,n,128);
         break;
       case 10:
-        c = SquareMatrixMul_SplitToBlocks_MultiThreadsByOMP(a,b,n,256);
-        break;
-      case 11:
         c = SquareMatrixMul_SSE(a,b,n);
         break;
+      case 11:
+        c = SquareMatrixMul_4x4Blocked_SSE(a,b,n);
+        break;
       case 12:
-        c = SquareMatrixMul_AVX(a,b,n);
+        c = SquareMatrixMul_8x8Blocked_AVX(a,b,n);
         break;
       case 13:
-        c = SquareMatrixMul_BlocksAndSSE(a,b,n,64);
+        c = SquareMatrixMul_8x8Blocked_AVX_OMP(a,b,n);
         break;
       default:
         fprintf(log_file, "Invalid input!\n");
         break;
     }
 
-//    printf("-----matrix c-----\n");// todo: delete
-//    PrintSquareMatrix(c,n);  // todo: delete
-//    printf("----------\n");// todo: delete
+    printf("-----matrix c-----\n");// todo: delete
+    PrintSquareMatrix(c,n);  // todo: delete
+    printf("----------\n");// todo: delete
 
     float trace = SquareMatrixTrace(c,n);
 
