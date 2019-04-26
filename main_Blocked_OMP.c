@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
   
   const int n = 8192;
   const float seed = 0.3;
-  const num_threads = 12;
+  const int num_threads = 12;
   log_file = fopen("program-log-Blocked-OMP.txt", "w");
   fprintf(log_file, "Blocked, OpenMP, %d Threads\n----------\n", num_threads);
   fprintf(log_file, "Number of cores: %d\n----------\n", omp_get_num_procs());
@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
     c = SquareMatrixMul_Blocked_OMP(a,b,n,block_size,num_threads);
     float trace = SquareMatrixTrace(c,n);
 
-    fprintf(log_file, "%dx%d Blocked\n", block_size);
+    fprintf(log_file, "%dx%d Blocked\n", block_size, block_size);
     fprintf(log_file, "Trace: %f\n", trace);
 
     // Calculate the time spent by the multiplication.

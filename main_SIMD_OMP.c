@@ -13,9 +13,9 @@ int main(int argc, char *argv[]) {
   
   const int n = 8192;
   const float seed = 0.3;
-  const num_threads = 12;
+  const int num_threads = 12;
   log_file = fopen("program-log-Blocked-SIMD-OMP.txt", "w");
-  fprintf(log_file, "Blocked, SIMD, OpenMP, %d Threads\n----------\n");
+  fprintf(log_file, "Blocked, SIMD, OpenMP, %d Threads\n----------\n", num_threads);
   fprintf(log_file, "Number of cores: %d\n----------\n", omp_get_num_procs());
 
   float *a = malloc(n*n * sizeof(*a));  // float *a = new float[n*n];
@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
   fprintf(log_file, "Order of matrix: %d\nSeed: %f\n----------\n", n, seed);
 
 //----------------------------------------------------------------------------
-
+{
   struct timeval start;
   struct timeval end;
   double diff;
@@ -47,9 +47,9 @@ int main(int argc, char *argv[]) {
   // diff is time spent by the program, and the unit is second
 
   free(c);
-
+}
 //----------------------------------------------------------------------------
-
+{
   struct timeval start;
   struct timeval end;
   double diff;
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
   // diff is time spent by the program, and the unit is second
 
   free(c);
-
+}
 //----------------------------------------------------------------------------
 
   fclose(log_file);
