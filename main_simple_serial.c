@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
   fprintf(log_file, "Simple Serial\n----------\n");
 
   
-  for (int n=512; n<=8192; n<<1) {
+  for (int n=512; n<=8192; n<<=1) {
     float *a = malloc(n*n * sizeof(*a));  // float *a = new float[n*n];
     float *b = malloc(n*n * sizeof(*b));
 
