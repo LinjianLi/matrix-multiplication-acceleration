@@ -25,6 +25,9 @@ int main(int argc, char *argv[]) {
   matrix_gen(a,b,n,seed);
   fprintf(log_file, "Order of matrix: %d\nSeed: %f\n----------\n", n, seed);
 
+  fflush(log_file);
+
+
 //----------------------------------------------------------------------------
 {
   struct timeval start;

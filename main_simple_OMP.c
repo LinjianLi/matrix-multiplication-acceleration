@@ -24,6 +24,8 @@ int main(int argc, char *argv[]) {
   matrix_gen(a,b,n,seed);
   fprintf(log_file, "Order of matrix: %d\nSeed: %f\n----------\n", n, seed);
 
+  fflush(log_file);
+
   int arr_num_threads[5] = {2,4,8,12,16};
   for (int i=0; i<5; ++i) {
 

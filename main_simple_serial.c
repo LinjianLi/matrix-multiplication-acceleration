@@ -14,6 +14,8 @@ int main(int argc, char *argv[]) {
   log_file = fopen("program-log-simple-serial.txt", "w");
   fprintf(log_file, "Simple Serial\n----------\n");
 
+  fflush(log_file);
+
   
   for (int n=512; n<=8192; n<<=1) {
     float *a = malloc(n*n * sizeof(*a));  // float *a = new float[n*n];
