@@ -11,8 +11,9 @@ int main(int argc, char *argv[]) {
 
   FILE *log_file;
   
-  const int n = 8192;
-  const float seed = 0.3;
+  int n = strtol(argv[1]);
+  float seed = strtod(argv[2]);
+
   log_file = fopen("program-log-simple-OMP.txt", "w");
   fprintf(log_file, "Simple OpenMP\n----------\n");
   fprintf(log_file, "Number of cores: %d\n----------\n", omp_get_num_procs());
@@ -26,8 +27,8 @@ int main(int argc, char *argv[]) {
 
   fflush(log_file);
 
-  int arr_num_threads[5] = {2,4,8,12,16};
-  for (int i=0; i<5; ++i) {
+  int arr_num_threads[6] = {2,4,8,12,16,24};
+  for (int i=0; i<6; ++i) {
 
     struct timeval start;
     struct timeval end;
@@ -51,6 +52,7 @@ int main(int argc, char *argv[]) {
     free(c);
   }
 
+  fprintf(log_file, "Finished\n);
   fclose(log_file);
 
   return 0;

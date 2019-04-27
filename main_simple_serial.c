@@ -47,6 +47,8 @@ int main(int argc, char *argv[]) {
     free(c);
   }
 
+
+  fprintf(log_file, "Finished\n);
   fclose(log_file);
 
   return 0;

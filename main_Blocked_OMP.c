@@ -11,9 +11,10 @@ int main(int argc, char *argv[]) {
 
   FILE *log_file;
   
-  const int n = 8192;
-  const float seed = 0.3;
-  const int num_threads = 12;
+  int n = strtol(argv[1]);
+  float seed = strtod(argv[2]);
+  int num_threads = strtol(argv[3]);
+
   log_file = fopen("program-log-Blocked-OMP.txt", "w");
   fprintf(log_file, "Blocked, OpenMP, %d Threads\n----------\n", num_threads);
   fprintf(log_file, "Number of cores: %d\n----------\n", omp_get_num_procs());
@@ -52,6 +53,7 @@ int main(int argc, char *argv[]) {
     free(c);
   }
 
+  fprintf(log_file, "Finished\n);
   fclose(log_file);
 
   return 0;
