@@ -26,8 +26,8 @@ int main(int argc, char *argv[]) {
 
   fflush(log_file);
 
-  int arr_num_threads[6] = {2,4,8,12,16,24};
-  for (int i=0; i<6; ++i) {
+  int arr_num_threads[11] = {4,8,12,16,24,28,32,36,40,44,48};
+  for (int i=0; i<11; ++i) {
 
     struct timeval start;
     struct timeval end;
