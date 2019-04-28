@@ -11,6 +11,9 @@ int main(int argc, char *argv[]) {
 
   int n = strtol(argv[1], NULL, 10);
   float seed = strtof(argv[2], NULL);
+  int min_num_threads = strtol(argv[3], NULL, 10);
+  int max_num_threads = strtol(argv[4], NULL, 10);
+  int stride_num_threads = strtol(argv[5], NULL, 10);
 
   FILE *log_file;
   log_file = fopen("program-log-simple-OMP.txt", "w");
@@ -26,18 +29,17 @@ int main(int argc, char *argv[]) {
 
   fflush(log_file);
 
-  int arr_num_threads[11] = {4,8,12,16,24,28,32,36,40,44,48};
-  for (int i=0; i<11; ++i) {
+  for (int num_threads=min_num_threads; num_threads<max_num_threads; num_threads+=stride_num_threads) {
 
     struct timeval start;
     struct timeval end;
     double diff;
     gettimeofday(&start,NULL);
 
-    c = SquareMatrixMul_OMP(a,b,n,arr_num_threads[i]);
+    c = SquareMatrixMul_OMP(a,b,n,num_threads);
     float trace = SquareMatrixTrace(c,n);
 
-    fprintf(log_file, "%d Threads\n", arr_num_threads[i]);
+    fprintf(log_file, "%d Threads\n", num_threads);
     fprintf(log_file, "Trace: %f\n", trace);
 
     // Calculate the time spent by the multiplication.
