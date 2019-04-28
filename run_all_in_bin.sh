@@ -1,6 +1,6 @@
 cd bin
 
-./Matrix_mul_simple_serial
-./Matrix_mul_simple_OMP 8192 0.3
-./Matrix_mul_Blocked_OMP 8192 0.3 12
-./Matrix_mul_SIMD_OMP 8192 0.3 12
+./MtrxMul_Serial 4096 0.3
+./MtrxMul_OMP 4096 0.3
+./MtrxMul_Blocked_OMP 4096 0.3 12
+./MtrxMul_SIMD_OMP 4096 0.3 12

@@ -9,13 +9,11 @@
 
 int main(int argc, char *argv[]) {
 
+  int n = strtol(argv[1], NULL, 10);
+  float seed = strtof(argv[2], NULL);
+  int num_threads = strtol(argv[3], NULL, 10);
+
   FILE *log_file;
-  
-  int n = strtol(argv[1]);
-  float seed = strtod(argv[2]);
-  int num_threads = strtol(argv[3]);
-
-
   log_file = fopen("program-log-Blocked-SIMD-OMP.txt", "w");
   fprintf(log_file, "Blocked, SIMD, OpenMP, %d Threads\n----------\n", num_threads);
   fprintf(log_file, "Number of cores: %d\n----------\n", omp_get_num_procs());
@@ -78,7 +76,7 @@ int main(int argc, char *argv[]) {
 }
 //----------------------------------------------------------------------------
 
-  fprintf(log_file, "Finished\n);
+  fprintf(log_file, "Finished\n");
   fclose(log_file);
 
   return 0;

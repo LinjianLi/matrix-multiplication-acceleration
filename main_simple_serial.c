@@ -8,16 +8,17 @@
 
 int main(int argc, char *argv[]) {
 
+  int N = strtol(argv[1], NULL, 10);
+  float seed = strtof(argv[2], NULL);
+
   FILE *log_file;
-  
-  float seed = 0.3;
   log_file = fopen("program-log-simple-serial.txt", "w");
   fprintf(log_file, "Simple Serial\n----------\n");
 
   fflush(log_file);
 
   
-  for (int n=512; n<=8192; n<<=1) {
+  for (int n=128; n<=N; n<<=1) {
     float *a = malloc(n*n * sizeof(*a));  // float *a = new float[n*n];
     float *b = malloc(n*n * sizeof(*b));
 
@@ -48,7 +49,7 @@ int main(int argc, char *argv[]) {
   }
 
 
-  fprintf(log_file, "Finished\n);
+  fprintf(log_file, "Finished\n");
   fclose(log_file);
 
   return 0;

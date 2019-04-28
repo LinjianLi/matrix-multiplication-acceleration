@@ -9,11 +9,10 @@
 
 int main(int argc, char *argv[]) {
 
-  FILE *log_file;
-  
-  int n = strtol(argv[1]);
-  float seed = strtod(argv[2]);
+  int n = strtol(argv[1], NULL, 10);
+  float seed = strtof(argv[2], NULL);
 
+  FILE *log_file;
   log_file = fopen("program-log-simple-OMP.txt", "w");
   fprintf(log_file, "Simple OpenMP\n----------\n");
   fprintf(log_file, "Number of cores: %d\n----------\n", omp_get_num_procs());
@@ -52,7 +51,7 @@ int main(int argc, char *argv[]) {
     free(c);
   }
 
-  fprintf(log_file, "Finished\n);
+  fprintf(log_file, "Finished\n");
   fclose(log_file);
 
   return 0;
