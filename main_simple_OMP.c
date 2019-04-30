@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
   int n = strtol(argv[1], NULL, 10);
   float seed = strtof(argv[2], NULL);
   int min_num_threads = strtol(argv[3], NULL, 10);
-  int max_num_threads = strtol(argv[4], NULL, 10);
+  int max_num_threads_not_included = strtol(argv[4], NULL, 10);
   int stride_num_threads = strtol(argv[5], NULL, 10);
 
   FILE *log_file;
@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 
   fflush(log_file);
 
-  for (int num_threads=min_num_threads; num_threads<max_num_threads; num_threads+=stride_num_threads) {
+  for (int num_threads=min_num_threads; num_threads!=max_num_threads_not_included; num_threads+=stride_num_threads) {
 
     struct timeval start;
     struct timeval end;
