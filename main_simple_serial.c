@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 
     // Calculate the time spent by the multiplication.
     gettimeofday(&end,NULL);
-    diff = (end.tv_sec-start.tv_sec) + ((double)(end.tv_usec-start.tv_usec))/1.0E9;
+    diff = (end.tv_sec-start.tv_sec) + ((double)(end.tv_usec-start.tv_usec))/1.0E6;
     setlocale(LC_NUMERIC, "");
     fprintf(log_file, "The time spent is %'lf seconds\n----------\n", diff);
     fflush(log_file);
