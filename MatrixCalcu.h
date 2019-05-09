@@ -11,6 +11,32 @@
 #include <memory.h>
 #include "omp.h"
 
+
+float MinOfMaxOfEachRow_AVX(float *c,int N){
+    float* results = malloc(sizeof(float)*8);
+    for(int j = 0; j<8; j++){
+        results[j]=0;
+    }
+    float min = 1<<20;
+    for(int i =0; i<N; i++){
+        float max =-1;
+        __m256 result = _mm256_set1_ps(-1024.0);
+        for(int j = 0; j<N; j+=8) {
+            __m256 temp = _mm256_loadu_ps(&c[i*N+j]);
+            result = _mm256_max_ps(result,temp);
+        }
+        _mm256_storeu_ps(results,result);
+        for(int j = 0; j<8; j++){
+            if(results[j]>max)
+                max = results[j];
+        }
+        if(max<min){
+            min=max;
+        }
+    }
+    return min;
+}
+
 float MinOfMaxOfEachRow(float *mtrx, size_t n) {
   float *max_each_row = malloc(n * sizeof(*max_each_row));
   #pragma omp parallel for // Do not use "collapse(2)" !!!
