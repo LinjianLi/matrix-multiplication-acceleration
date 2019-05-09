@@ -11,6 +11,24 @@
 #include <memory.h>
 #include "omp.h"
 
+float MinOfMaxOfEachRow(float *mtrx, size_t n) {
+  float *max_each_row = malloc(n * sizeof(*max_each_row));
+  #pragma omp parallel for // Do not use "collapse(2)" !!!
+  for (int row=0; row<n; ++row) {
+    for (int column=0; column<n; ++column) {
+      if (column==0 || max_each_row[row]<mtrx[row*n+column]) {
+        max_each_row[row] = mtrx[row*n+column];
+      }
+    }
+  }
+  float min;
+  for (int i=0; i<n; ++i) {
+    if (i==0 || min>max_each_row[i]) {
+      min = max_each_row[i];
+    }
+  }
+  return min;
+}
 
 float* InitZeroSquareMatrix(size_t block_size) {
   float *result = malloc(block_size*block_size * sizeof(*result));

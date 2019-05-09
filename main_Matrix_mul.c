@@ -20,8 +20,7 @@ int main(int argc, char *argv[]) {
 
   matrix_gen(a,b,n,seed);
   c = SquareMatrixMul_8x8Blocked_AVX_OMP(a,b,n,num_threads);
-  float trace = SquareMatrixTrace(c,n);
-  printf("%lf", trace);
+  printf("%lf", MinOfMaxOfEachRow(c,n));
 
   return 0;
 }
